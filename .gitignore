@@ -1,0 +1,11 @@
+/build/
+/dist/
+node_modules/
+tmp-jam-pack-nodegui/
+
+
+.history
+
+AppRun
+Application-x86_64.AppImage
+qode
