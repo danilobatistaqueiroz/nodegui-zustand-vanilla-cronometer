@@ -1826,11 +1826,11 @@ var require_source_map_support = __commonJS({
   "node_modules/source-map-support/source-map-support.js"(exports, module2) {
     var SourceMapConsumer = require_source_map().SourceMapConsumer;
     var path2 = require("path");
-    var fs;
+    var fs2;
     try {
-      fs = require("fs");
-      if (!fs.existsSync || !fs.readFileSync) {
-        fs = null;
+      fs2 = require("fs");
+      if (!fs2.existsSync || !fs2.readFileSync) {
+        fs2 = null;
       }
     } catch (err) {
     }
@@ -1901,7 +1901,7 @@ var require_source_map_support = __commonJS({
       }
       var contents = "";
       try {
-        if (!fs) {
+        if (!fs2) {
           var xhr = new XMLHttpRequest();
           xhr.open(
             "GET",
@@ -1913,8 +1913,8 @@ var require_source_map_support = __commonJS({
           if (xhr.readyState === 4 && xhr.status === 200) {
             contents = xhr.responseText;
           }
-        } else if (fs.existsSync(path3)) {
-          contents = fs.readFileSync(path3, "utf8");
+        } else if (fs2.existsSync(path3)) {
+          contents = fs2.readFileSync(path3, "utf8");
         }
       } catch (er) {
       }
@@ -2182,9 +2182,9 @@ var require_source_map_support = __commonJS({
         var line = +match[2];
         var column = +match[3];
         var contents = fileContentsCache[source];
-        if (!contents && fs && fs.existsSync(source)) {
+        if (!contents && fs2 && fs2.existsSync(source)) {
           try {
-            contents = fs.readFileSync(source, "utf8");
+            contents = fs2.readFileSync(source, "utf8");
           } catch (er) {
             contents = "";
           }
@@ -3304,7 +3304,7 @@ var require_async = __commonJS({
 var require_mkdirp = __commonJS({
   "node_modules/node-storage/node_modules/mkdirp/index.js"(exports, module2) {
     var path2 = require("path");
-    var fs = require("fs");
+    var fs2 = require("fs");
     var _0777 = parseInt("0777", 8);
     module2.exports = mkdirP.mkdirp = mkdirP.mkdirP = mkdirP;
     function mkdirP(p, opts, f, made) {
@@ -3315,7 +3315,7 @@ var require_mkdirp = __commonJS({
         opts = { mode: opts };
       }
       var mode = opts.mode;
-      var xfs = opts.fs || fs;
+      var xfs = opts.fs || fs2;
       if (mode === void 0) {
         mode = _0777;
       }
@@ -3357,7 +3357,7 @@ var require_mkdirp = __commonJS({
         opts = { mode: opts };
       }
       var mode = opts.mode;
-      var xfs = opts.fs || fs;
+      var xfs = opts.fs || fs2;
       if (mode === void 0) {
         mode = _0777;
       }
@@ -3393,7 +3393,7 @@ var require_mkdirp = __commonJS({
 // node_modules/node-storage/index.js
 var require_node_storage = __commonJS({
   "node_modules/node-storage/index.js"(exports, module2) {
-    var fs = require("fs");
+    var fs2 = require("fs");
     var async = require_async();
     var mkdirp = require_mkdirp();
     function isObject(obj) {
@@ -3484,26 +3484,26 @@ var require_node_storage = __commonJS({
         async.apply(self._fileMustNotExist, self.backupFilename),
         async.apply(self._doBackup.bind(self)),
         async.apply(self.writeData, self.tempFilename, _data),
-        async.apply(fs.rename, self.tempFilename, self.filename),
+        async.apply(fs2.rename, self.tempFilename, self.filename),
         async.apply(self._fileMustNotExist, self.backupFilename)
       ], cb);
     };
     Storage2.prototype.writeData = function(filename, data, cb) {
       var _fd;
       async.waterfall([
-        async.apply(fs.open, filename, "w"),
+        async.apply(fs2.open, filename, "w"),
         function(fd, cb2) {
           _fd = fd;
           var buf = new Buffer(data);
           var offset = 0;
           var position = 0;
-          fs.write(fd, buf, offset, buf.length, position, cb2);
+          fs2.write(fd, buf, offset, buf.length, position, cb2);
         },
         function(written, buf, cb2) {
-          fs.fsync(_fd, cb2);
+          fs2.fsync(_fd, cb2);
         },
         function(cb2) {
-          fs.close(_fd, cb2);
+          fs2.close(_fd, cb2);
         }
       ], function(err) {
         cb(err);
@@ -3511,17 +3511,17 @@ var require_node_storage = __commonJS({
     };
     Storage2.prototype._doBackup = function(cb) {
       var self = this;
-      fs.exists(self.filename, function(exists) {
+      fs2.exists(self.filename, function(exists) {
         if (!exists) {
           return cb(null);
         }
-        fs.rename(self.filename, self.backupFilename, cb);
+        fs2.rename(self.filename, self.backupFilename, cb);
       });
     };
     Storage2.prototype._load = function() {
       var data;
       try {
-        data = JSON.parse(fs.readFileSync(this.filename));
+        data = JSON.parse(fs2.readFileSync(this.filename));
       } catch (e) {
         if (e.code !== "ENOENT") {
           throw e;
@@ -3531,11 +3531,11 @@ var require_node_storage = __commonJS({
       return data;
     };
     Storage2.prototype._fileMustNotExist = function(file, cb) {
-      fs.exists(file, function(exists) {
+      fs2.exists(file, function(exists) {
         if (!exists) {
           return cb(null);
         }
-        fs.unlink(file, function(err) {
+        fs2.unlink(file, function(err) {
           return cb(err);
         });
       });
@@ -3579,11 +3579,16 @@ var initial = 0;
 var cronometerStore = createStore((set) => ({
   intervaloId: null,
   elapsed: initial,
+  setElapsed: (value = 1) => {
+    set({ elapsed: value });
+  },
   start: () => {
+    add();
     const novoId = setInterval(add, 1e3);
-    set({ intervaloId: novoId, elapsed: 1 });
+    set({ intervaloId: novoId });
   },
   resume: () => {
+    add();
     const novoId = setInterval(add, 1e3);
     set({ intervaloId: novoId });
   },
@@ -3611,11 +3616,14 @@ function add() {
 var import_nodegui = require("@nodegui/nodegui");
 var path = __toESM(require("node:path"));
 var import_source_map_support = __toESM(require_source_map_support());
+var import_fs = __toESM(require("fs"));
 var import_node_storage = __toESM(require_node_storage());
 import_source_map_support.default.install();
 function main() {
   var store = new import_node_storage.default("./storage.json");
   let theme = store.get("theme");
+  let elapsed = Number(import_fs.default.readFileSync("elapsed.json"));
+  cronometerStore.getState().setElapsed(elapsed);
   function resetStartStop(btStartStop2) {
     btStartStop2.setText("Iniciar");
     btStartStop2.removeEventListener("clicked", start);
@@ -3635,9 +3643,10 @@ function main() {
   const reset = () => {
     cronometerStore.getState().reset();
   };
-  function getFormatedDisplay(elapsed = 0, value = "01/01/2025 00:00:00") {
+  function getFormatedDisplay(pelapsed = 0, value = "01/01/2025 00:00:00") {
     let time = new Date(value);
-    time.setSeconds(time.getSeconds() + elapsed);
+    time.setSeconds(time.getSeconds() + pelapsed);
+    elapsed = pelapsed;
     let formatedTime = time.toLocaleTimeString("en-US", {
       hour: "2-digit",
       minute: "2-digit",
@@ -3704,7 +3713,7 @@ function main() {
   tbThemes.setObjectName("tbThemes");
   const display = new import_nodegui.QLabel();
   display.setObjectName("display");
-  display.setText(getFormatedDisplay());
+  display.setText(getFormatedDisplay(elapsed));
   const btStartStop = new import_nodegui.QPushButton();
   btStartStop.setObjectName("btStartStop");
   resetStartStop(btStartStop);
@@ -3718,6 +3727,17 @@ function main() {
   rootLayout.addWidget(tbThemes);
   win.setCentralWidget(centralWidget);
   win.setMinimumWidth(300);
+  win.addEventListener(import_nodegui.WidgetEventTypes.Close, () => {
+    import_fs.default.writeFileSync("elapsed.json", String(elapsed));
+  });
+  display.addEventListener(import_nodegui.WidgetEventTypes.MouseButtonDblClick, () => {
+    elapsed += 1800;
+    cronometerStore.getState().setElapsed(elapsed);
+  });
+  const screen = import_nodegui.QApplication.primaryScreen().geometry();
+  const x = screen.width() - 300;
+  const y = screen.height() - 300;
+  win.move(x / 2, y / 2);
   function setStyles(fontColor, backgroundColor, displayFontColor) {
     return `
       #tbThemes {
