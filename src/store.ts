@@ -6,11 +6,16 @@ export const cronometerStore: any = createStore((set) => ({
   intervaloId: null,
   elapsed: initial,
 
+  setElapsed: (value:number=1) => {
+    set({ elapsed: value })
+  },
   start: () => {
+    add()
     const novoId = setInterval(add, 1000);
-    set({ intervaloId: novoId, elapsed: 1 });
+    set({ intervaloId: novoId });
   },
   resume: () => {
+    add()
     const novoId = setInterval(add, 1000);
     set({ intervaloId: novoId });
   },

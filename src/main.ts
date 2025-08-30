@@ -1,7 +1,8 @@
 import { cronometerStore } from "./store";
-import { QMainWindow, QWidget, QLabel, QPushButton, QIcon, QBoxLayout, ToolButtonPopupMode, QToolButton, ArrowType, Direction, ToolButtonStyle, QMenu, QAction } from '@nodegui/nodegui';
+import { QApplication, QScreen, QMainWindow, QWidget, QLabel, QPushButton, QIcon, QBoxLayout, ToolButtonPopupMode, QToolButton, ArrowType, Direction, ToolButtonStyle, QMenu, QAction, WidgetEventTypes } from '@nodegui/nodegui';
 import * as path from "node:path";
 import sourceMapSupport from 'source-map-support';
+import fs from 'fs';
 
 sourceMapSupport.install();
 
@@ -11,6 +12,8 @@ function main(): void {
 
   var store = new Storage('./storage.json');
   let theme = store.get('theme')
+  let elapsed = Number(fs.readFileSync('elapsed.json'))
+  cronometerStore.getState().setElapsed(elapsed);
 
   function resetStartStop(btStartStop:QPushButton){
     btStartStop.setText("Iniciar");
@@ -33,9 +36,10 @@ function main(): void {
     cronometerStore.getState().reset()
   }
 
-  function getFormatedDisplay(elapsed:number=0,value:string="01/01/2025 00:00:00"){
+  function getFormatedDisplay(pelapsed:number=0,value:string="01/01/2025 00:00:00"){
     let time = new Date(value);
-    time.setSeconds(time.getSeconds() + elapsed);
+    time.setSeconds(time.getSeconds() + pelapsed);
+    elapsed = pelapsed;
     let formatedTime = time.toLocaleTimeString("en-US", {
       hour: "2-digit",
       minute: "2-digit",
@@ -113,7 +117,7 @@ function main(): void {
 
   const display = new QLabel();
   display.setObjectName("display");
-  display.setText(getFormatedDisplay());
+  display.setText(getFormatedDisplay(elapsed));
 
   const btStartStop = new QPushButton();
   btStartStop.setObjectName("btStartStop");
@@ -131,6 +135,19 @@ function main(): void {
 
   win.setCentralWidget(centralWidget);
   win.setMinimumWidth(300);
+
+  win.addEventListener(WidgetEventTypes.Close, () => {
+    fs.writeFileSync("elapsed.json", String(elapsed));
+  })
+  display.addEventListener(WidgetEventTypes.MouseButtonDblClick, () => {
+    elapsed+=1800
+    cronometerStore.getState().setElapsed(elapsed)
+  })
+
+  const screen = QApplication.primaryScreen().geometry();
+  const x = screen.width()-300;
+  const y = screen.height()-300;
+  win.move(x/2,y/2);
   
   function setStyles(fontColor:string,backgroundColor:string,displayFontColor:string): string{
     return `

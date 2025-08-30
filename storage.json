@@ -1,1 +1,3 @@
-{"theme":{"theme":"Monokai","backgroundColor":"rgb(5, 7, 24)","fontColor":"rgb(19, 19, 24)","displayFontColor":"rgb(50,50,200)"}}
+{
+  "theme":{"theme":"Monokai","backgroundColor":"rgb(5, 7, 24)","fontColor":"rgb(19, 19, 24)","displayFontColor":"rgb(50,50,200)"}
+}
