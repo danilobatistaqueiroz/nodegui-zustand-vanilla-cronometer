@@ -144,6 +144,8 @@ function main(): void {
     cronometerStore.getState().setElapsed(elapsed)
   })
 
+  setInterval( () => fs.writeFileSync("elapsed.json", String(elapsed)), 1000*60 );
+
   const screen = QApplication.primaryScreen().geometry();
   const x = screen.width()-300;
   const y = screen.height()-300;
