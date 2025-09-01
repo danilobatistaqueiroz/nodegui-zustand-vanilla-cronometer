@@ -1,5 +1,5 @@
 import { cronometerStore } from "./store";
-import { QApplication, QMainWindow, QWidget, QLabel, QPushButton, QIcon, QBoxLayout, ToolButtonPopupMode, QToolButton, Direction, ToolButtonStyle, QMenu, QAction } from '@nodegui/nodegui';
+import { QApplication, QMainWindow, QWidget, QLabel, QPushButton, QIcon, QBoxLayout, ToolButtonPopupMode, QToolButton, Direction, ToolButtonStyle, QMenu, QAction, WidgetEventTypes, QMouseEvent, MouseButton } from '@nodegui/nodegui';
 import * as path from "node:path";
 import sourceMapSupport from 'source-map-support';
 
@@ -106,7 +106,17 @@ function main(): void {
 
   const display = new QLabel();
   display.setObjectName("display");
-
+  
+  display.addEventListener(WidgetEventTypes.MouseButtonPress, (e:any) => {
+    const mouseEvt = new QMouseEvent(e);
+    if(mouseEvt.button()==MouseButton.RightButton){
+      cronometerStore.getState().setElapsed(0);
+    }
+  })
+  display.addEventListener(WidgetEventTypes.MouseButtonDblClick, () => {
+    let elapsed = cronometerStore.getState().elapsed;
+    cronometerStore.getState().setElapsed(elapsed+(60*60))
+  })
   display.setText(getFormatedDisplay(cronometerStore.getState().elapsed));
 
   const btStartStop = new QPushButton();
