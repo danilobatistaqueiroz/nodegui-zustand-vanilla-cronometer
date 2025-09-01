@@ -1,19 +1,13 @@
 import { cronometerStore } from "./store";
-import { QApplication, QScreen, QMainWindow, QWidget, QLabel, QPushButton, QIcon, QBoxLayout, ToolButtonPopupMode, QToolButton, ArrowType, Direction, ToolButtonStyle, QMenu, QAction, WidgetEventTypes } from '@nodegui/nodegui';
+import { QApplication, QMainWindow, QWidget, QLabel, QPushButton, QIcon, QBoxLayout, ToolButtonPopupMode, QToolButton, Direction, ToolButtonStyle, QMenu, QAction } from '@nodegui/nodegui';
 import * as path from "node:path";
 import sourceMapSupport from 'source-map-support';
-import fs from 'fs';
+
+const themes = require("themes.json");
 
 sourceMapSupport.install();
 
-import Storage from "node-storage";
-
 function main(): void {
-
-  var store = new Storage('./storage.json');
-  let theme = store.get('theme')
-  let elapsed = Number(fs.readFileSync('elapsed.json'))
-  cronometerStore.getState().setElapsed(elapsed);
 
   function resetStartStop(btStartStop:QPushButton){
     btStartStop.setText("Iniciar");
@@ -39,7 +33,6 @@ function main(): void {
   function getFormatedDisplay(pelapsed:number=0,value:string="01/01/2025 00:00:00"){
     let time = new Date(value);
     time.setSeconds(time.getSeconds() + pelapsed);
-    elapsed = pelapsed;
     let formatedTime = time.toLocaleTimeString("en-US", {
       hour: "2-digit",
       minute: "2-digit",
@@ -93,18 +86,11 @@ function main(): void {
   const menu = new QMenu(tbThemes);
   tbThemes.setMenu(menu);
 
-  const themes = [
-    {theme:"Monokai",backgroundColor:'rgb(5, 7, 24)',fontColor:'rgb(19, 19, 24)',displayFontColor:'rgb(50,50,200)'},
-    {theme:"Dracula",backgroundColor:'rgb(80, 4, 33)',fontColor:'rgb(214, 174, 204)',displayFontColor:'rgb(177, 1, 59)'},
-    {theme:"Midnight",backgroundColor:'rgb(0, 0, 0)',fontColor:'rgb(11, 11, 80)',displayFontColor:'rgb(1, 1, 196)'},
-    {theme:"Light",backgroundColor:'rgb(255,255,255)',fontColor:'rgb(13, 13, 37)',displayFontColor:'rgb(151, 151, 161)'},
-    {theme:"Windows",backgroundColor:'rgb(107, 107, 107)',fontColor:'rgb(0, 0, 0)',displayFontColor:'rgb(23, 23, 26)'}
-  ]
   themes.forEach((t)=>{
     const menuAction = new QAction();
     menuAction.setText(t.theme);
     menuAction.addEventListener("triggered", () => {
-      store.put('theme', {...t});
+      cronometerStore.getState().setTheme({...t})
       tbThemes.setText(t.theme);
       win.setStyleSheet(
         setStyles(t.fontColor,t.backgroundColor,t.displayFontColor)
@@ -112,12 +98,16 @@ function main(): void {
     });
     menu.addAction(menuAction);
   });
+
+  let theme = cronometerStore.getState().selectedTheme;
   tbThemes.setText(theme.theme)
+
   tbThemes.setObjectName("tbThemes");
 
   const display = new QLabel();
   display.setObjectName("display");
-  display.setText(getFormatedDisplay(elapsed));
+
+  display.setText(getFormatedDisplay(cronometerStore.getState().elapsed));
 
   const btStartStop = new QPushButton();
   btStartStop.setObjectName("btStartStop");
@@ -135,16 +125,6 @@ function main(): void {
 
   win.setCentralWidget(centralWidget);
   win.setMinimumWidth(300);
-
-  win.addEventListener(WidgetEventTypes.Close, () => {
-    fs.writeFileSync("elapsed.json", String(elapsed));
-  })
-  display.addEventListener(WidgetEventTypes.MouseButtonDblClick, () => {
-    elapsed+=1800
-    cronometerStore.getState().setElapsed(elapsed)
-  })
-
-  setInterval( () => fs.writeFileSync("elapsed.json", String(elapsed)), 1000*60 );
 
   const screen = QApplication.primaryScreen().geometry();
   const x = screen.width()-300;
