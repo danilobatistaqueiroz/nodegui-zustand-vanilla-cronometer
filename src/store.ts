@@ -1,5 +1,5 @@
 import {createStore} from "zustand/vanilla";
-import { persist, createJSONStorage } from 'zustand/middleware'
+import { persist, createJSONStorage, subscribeWithSelector } from 'zustand/middleware'
 
 import Storage from "node-storage";
 var localStorage = new Storage('./storage.json');
@@ -19,7 +19,7 @@ const oneStorage = {
   removeItem: (key: string) => localStorage.remove(key),
 }
 
-export const cronometerStore: any = createStore(persist(
+export const cronometerStore: any = createStore(subscribeWithSelector(persist(
   (set) => (
   {
     intervaloId: null,
@@ -60,7 +60,7 @@ export const cronometerStore: any = createStore(persist(
     },
   } //I had to remove intervaloId, because it isn't useful, its useless to restart the timer, elapsed is enough, and because intervaloId is a NodeJS.Timer and JSON.stringify emmit warning when parsing it.
   ),{name: 'datainfo', partialize: (state:any) => ({ elapsed: state.elapsed, selectedTheme: state.selectedTheme, }), storage: createJSONStorage(() => oneStorage)})
-  );
+  ));
 
 function add() {
   cronometerStore.setState((state: any) => ({elapsed: state.elapsed + 1,}));

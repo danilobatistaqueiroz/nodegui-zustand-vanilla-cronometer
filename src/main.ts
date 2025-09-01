@@ -3,7 +3,7 @@ import { QApplication, QMainWindow, QWidget, QLabel, QPushButton, QIcon, QBoxLay
 import * as path from "node:path";
 import sourceMapSupport from 'source-map-support';
 
-const themes = require("themes.json");
+const themes = require('../assets/themes.json')
 
 sourceMapSupport.install();
 
@@ -42,13 +42,17 @@ function main(): void {
     return formatedTime;
   }
 
-  cronometerStore.subscribe((state: any) => {
-    display.setText(getFormatedDisplay(state.elapsed));
+  cronometerStore.subscribe((state: any) => state.elapsed, (elapsed) => {
+    display.setText(getFormatedDisplay(elapsed));
+    if(elapsed==0){
+      resetStartStop(btStartStop)
+      display.setText(getFormatedDisplay())
+    }
   });
 
   let controles = {descricao:"", comando: ()=>{}};
-  cronometerStore.subscribe((state: any) => {
-    controles = state.intervaloId
+  cronometerStore.subscribe((state: any) => state.intervaloId, (intervaloId) => {
+    controles = intervaloId
     ? {
         descricao: "Pausar",
         comando: pause,
@@ -64,15 +68,11 @@ function main(): void {
         btStartStop.removeEventListener("clicked",resume);
         btStartStop.addEventListener("clicked", controles.comando);
       }
-      if(state.intervaloId==null && state.elapsed==0){
-        resetStartStop(btStartStop)
-        display.setText(getFormatedDisplay())
-      }
   });
 
   const win = new QMainWindow();
   win.setWindowTitle("Cronometro");
-  win.setWindowIcon(new QIcon(path.join(__dirname, '../assets/logox200.png')));
+  win.setWindowIcon(new QIcon(path.join(__dirname, '../assets/logo-clock.png')));
 
   const centralWidget = new QWidget();
 
