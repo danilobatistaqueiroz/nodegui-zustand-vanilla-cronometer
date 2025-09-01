@@ -3550,9 +3550,9 @@ var require_source_map_support = __commonJS({
   }
 });
 
-// themes.json
+// assets/themes.json
 var require_themes = __commonJS({
-  "themes.json"(exports, module2) {
+  "assets/themes.json"(exports, module2) {
     module2.exports = [
       { theme: "Monokai", backgroundColor: "rgb(5, 7, 24)", fontColor: "rgb(19, 19, 24)", displayFontColor: "rgb(50,50,200)" },
       { theme: "Dracula", backgroundColor: "rgb(80, 4, 33)", fontColor: "rgb(214, 174, 204)", displayFontColor: "rgb(177, 1, 59)" },
@@ -3588,6 +3588,30 @@ var createStoreImpl = (createState) => {
 var createStore = (createState) => createState ? createStoreImpl(createState) : createStoreImpl;
 
 // node_modules/zustand/esm/middleware.mjs
+var subscribeWithSelectorImpl = (fn) => (set, get, api) => {
+  const origSubscribe = api.subscribe;
+  api.subscribe = (selector, optListener, options) => {
+    let listener = selector;
+    if (optListener) {
+      const equalityFn = (options == null ? void 0 : options.equalityFn) || Object.is;
+      let currentSlice = selector(api.getState());
+      listener = (state) => {
+        const nextSlice = selector(state);
+        if (!equalityFn(currentSlice, nextSlice)) {
+          const previousSlice = currentSlice;
+          optListener(currentSlice = nextSlice, previousSlice);
+        }
+      };
+      if (options == null ? void 0 : options.fireImmediately) {
+        optListener(currentSlice, currentSlice);
+      }
+    }
+    return origSubscribe(listener);
+  };
+  const initialState = fn(set, get, api);
+  return initialState;
+};
+var subscribeWithSelector = subscribeWithSelectorImpl;
 function createJSONStorage(getStorage, options) {
   let storage;
   try {
@@ -3793,7 +3817,7 @@ var oneStorage = {
   setItem: (key, value) => localStorage2.put(key, value),
   removeItem: (key) => localStorage2.remove(key)
 };
-var cronometerStore = createStore(persist((set) => ({
+var cronometerStore = createStore(subscribeWithSelector(persist((set) => ({
   intervaloId: null,
   elapsed: 0,
   selectedTheme: theme,
@@ -3828,7 +3852,7 @@ var cronometerStore = createStore(persist((set) => ({
       return { intervaloId: null, elapsed: 0 };
     });
   }
-}), { name: "datainfo", partialize: (state) => ({ elapsed: state.elapsed, selectedTheme: state.selectedTheme }), storage: createJSONStorage(() => oneStorage) }));
+}), { name: "datainfo", partialize: (state) => ({ elapsed: state.elapsed, selectedTheme: state.selectedTheme }), storage: createJSONStorage(() => oneStorage) })));
 function add() {
   cronometerStore.setState((state) => ({ elapsed: state.elapsed + 1 }));
 }
@@ -3870,13 +3894,19 @@ function main() {
     });
     return formatedTime;
   }
-  cronometerStore.subscribe((state) => {
-    display.setText(getFormatedDisplay(state.elapsed));
+  cronometerStore.subscribe((state) => state.elapsed, (elapsed) => {
+    console.log("elapsed");
+    display.setText(getFormatedDisplay(elapsed));
+    if (elapsed == 0) {
+      resetStartStop(btStartStop);
+      display.setText(getFormatedDisplay());
+    }
   });
   let controles = { descricao: "", comando: () => {
   } };
-  cronometerStore.subscribe((state) => {
-    controles = state.intervaloId ? {
+  cronometerStore.subscribe((state) => state.intervaloId, (intervaloId) => {
+    console.log("intervaloId");
+    controles = intervaloId ? {
       descricao: "Pausar",
       comando: pause
     } : {
@@ -3890,14 +3920,10 @@ function main() {
       btStartStop.removeEventListener("clicked", resume);
       btStartStop.addEventListener("clicked", controles.comando);
     }
-    if (state.intervaloId == null && state.elapsed == 0) {
-      resetStartStop(btStartStop);
-      display.setText(getFormatedDisplay());
-    }
   });
   const win = new import_nodegui.QMainWindow();
   win.setWindowTitle("Cronometro");
-  win.setWindowIcon(new import_nodegui.QIcon(path.join(__dirname, "../assets/logox200.png")));
+  win.setWindowIcon(new import_nodegui.QIcon(path.join(__dirname, "../assets/logo-clock.png")));
   const centralWidget = new import_nodegui.QWidget();
   const rootLayout = new import_nodegui.QBoxLayout(import_nodegui.Direction.TopToBottom);
   centralWidget.setObjectName("wgtRoot");
