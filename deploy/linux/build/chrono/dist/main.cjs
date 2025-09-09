@@ -3554,11 +3554,11 @@ var require_source_map_support = __commonJS({
 var require_themes = __commonJS({
   "assets/themes.json"(exports, module2) {
     module2.exports = [
-      { theme: "Monokai", backgroundColor: "rgb(5, 7, 24)", fontColor: "rgb(19, 19, 24)", displayFontColor: "rgb(50,50,200)" },
-      { theme: "Dracula", backgroundColor: "rgb(80, 4, 33)", fontColor: "rgb(214, 174, 204)", displayFontColor: "rgb(177, 1, 59)" },
-      { theme: "Midnight", backgroundColor: "rgb(0, 0, 0)", fontColor: "rgb(11, 11, 80)", displayFontColor: "rgb(1, 1, 196)" },
-      { theme: "Light", backgroundColor: "rgb(255,255,255)", fontColor: "rgb(13, 13, 37)", displayFontColor: "rgb(151, 151, 161)" },
-      { theme: "Windows", backgroundColor: "rgb(107, 107, 107)", fontColor: "rgb(0, 0, 0)", displayFontColor: "rgb(23, 23, 26)" }
+      { theme: "Monokai", backgroundColor: "rgb(5, 7, 24)", bgTranspColor: "rgba(5, 7, 24, 0.2)", fontColor: "rgb(19, 19, 24)", displayFontColor: "rgb(50,50,200)" },
+      { theme: "Dracula", backgroundColor: "rgb(80, 4, 33)", bgTranspColor: "rgba(80, 4, 33, 0.2)", fontColor: "rgb(214, 174, 204)", displayFontColor: "rgb(177, 1, 59)" },
+      { theme: "Midnight", backgroundColor: "rgb(0, 0, 0)", bgTranspColor: "rgba(0, 0, 0, 0.2)", fontColor: "rgb(11, 11, 80)", displayFontColor: "rgb(1, 1, 196)" },
+      { theme: "Light", backgroundColor: "rgb(255,255,255)", bgTranspColor: "rgba(255,255,255, 0.2)", fontColor: "rgb(13, 13, 37)", displayFontColor: "rgb(151, 151, 161)" },
+      { theme: "Windows", backgroundColor: "rgb(107, 107, 107)", bgTranspColor: "rgba(107, 107, 107, 0.2)", fontColor: "rgb(0, 0, 0)", displayFontColor: "rgb(23, 23, 26)" }
     ];
   }
 });
@@ -3883,6 +3883,98 @@ function main() {
   const reset = () => {
     cronometerStore.getState().reset();
   };
+  let startOrPause = "start";
+  const startPause = () => {
+    startOrPause == "start" ? start() : pause();
+  };
+  const maximize = () => {
+    win.close();
+    win = new import_nodegui.QMainWindow();
+    win.setWindowTitle("Cronometro");
+    win.setWindowIcon(new import_nodegui.QIcon(path.join(__dirname, "../assets/logo-clock.png")));
+    centralWidget = new import_nodegui.QWidget();
+    rootLayout = new import_nodegui.QBoxLayout(import_nodegui.Direction.TopToBottom);
+    centralWidget.setObjectName("wgtRoot");
+    centralWidget.setLayout(rootLayout);
+    tbThemes = new import_nodegui.QToolButton();
+    tbThemes.setPopupMode(import_nodegui.ToolButtonPopupMode.MenuButtonPopup);
+    tbThemes.setToolButtonStyle(import_nodegui.ToolButtonStyle.ToolButtonFollowStyle);
+    menu = new import_nodegui.QMenu(tbThemes);
+    tbThemes.setMenu(menu);
+    themes.forEach((t) => {
+      const menuAction = new import_nodegui.QAction();
+      menuAction.setText(t.theme);
+      menuAction.addEventListener("triggered", () => {
+        cronometerStore.getState().setTheme({ ...t });
+        tbThemes.setText(t.theme);
+        win.setStyleSheet(setStyles(t.fontColor, t.backgroundColor, t.displayFontColor));
+      });
+      menu.addAction(menuAction);
+    });
+    theme2 = cronometerStore.getState().selectedTheme;
+    tbThemes.setText(theme2.theme);
+    tbThemes.setObjectName("tbThemes");
+    display = new import_nodegui.QLabel();
+    display.setObjectName("display");
+    display.addEventListener(import_nodegui.WidgetEventTypes.MouseButtonPress, (e) => {
+      const mouseEvt = new import_nodegui.QMouseEvent(e);
+      if (mouseEvt.button() == import_nodegui.MouseButton.RightButton) {
+        startPause();
+      }
+    });
+    display.addEventListener(import_nodegui.WidgetEventTypes.MouseButtonDblClick, minimize);
+    display.setText(getFormatedDisplay(cronometerStore.getState().elapsed));
+    btStartStop = new import_nodegui.QPushButton();
+    btStartStop.setObjectName("btStartStop");
+    resetStartStop(btStartStop);
+    btReset = new import_nodegui.QPushButton();
+    btReset.setObjectName("btReset");
+    btReset.setText("Reiniciar");
+    btReset.addEventListener("clicked", reset);
+    rootLayout.addWidget(display);
+    rootLayout.addWidget(btStartStop);
+    rootLayout.addWidget(btReset);
+    rootLayout.addWidget(tbThemes);
+    win.setCentralWidget(centralWidget);
+    win.setMinimumWidth(300);
+    screen = import_nodegui.QApplication.primaryScreen().geometry();
+    x = screen.width() - 300;
+    y = screen.height() - 300;
+    win.move(x / 2, y / 2);
+    win.setStyleSheet(setStyles(theme2.fontColor, theme2.backgroundColor, theme2.displayFontColor));
+    win.show();
+  };
+  const minimize = () => {
+    win.close();
+    win = new import_nodegui.QMainWindow();
+    win.setWindowIcon(new import_nodegui.QIcon(path.join(__dirname, "../assets/logo-clock.png")));
+    win.setWindowFlag(import_nodegui.WindowType.WindowStaysOnTopHint | import_nodegui.WindowType.FramelessWindowHint, true);
+    const centralWidget2 = new import_nodegui.QWidget();
+    const rootLayout2 = new import_nodegui.QBoxLayout(import_nodegui.Direction.TopToBottom);
+    centralWidget2.setObjectName("wgtRoot");
+    centralWidget2.setLayout(rootLayout2);
+    display = new import_nodegui.QLabel();
+    display.setObjectName("display");
+    display.addEventListener(import_nodegui.WidgetEventTypes.MouseButtonDblClick, maximize);
+    display.addEventListener(import_nodegui.WidgetEventTypes.MouseButtonPress, (e) => {
+      const mouseEvt = new import_nodegui.QMouseEvent(e);
+      if (mouseEvt.button() == import_nodegui.MouseButton.RightButton) {
+        startPause();
+      }
+    });
+    display.setText(getFormatedDisplay(cronometerStore.getState().elapsed));
+    rootLayout2.addWidget(display);
+    win.setCentralWidget(centralWidget2);
+    win.setMinimumWidth(40);
+    win.setMinimumHeight(10);
+    win.setWindowOpacity(0.4);
+    screen = import_nodegui.QApplication.primaryScreen().geometry();
+    x = screen.width() - 300;
+    y = 300;
+    win.move(x, y);
+    win.setStyleSheet(setStyles(theme2.fontColor, theme2.bgTranspColor, theme2.displayFontColor, "33px"));
+    win.show();
+  };
   function getFormatedDisplay(pelapsed = 0, value = "01/01/2025 00:00:00") {
     let time = new Date(value);
     time.setSeconds(time.getSeconds() + pelapsed);
@@ -3895,7 +3987,6 @@ function main() {
     return formatedTime;
   }
   cronometerStore.subscribe((state) => state.elapsed, (elapsed) => {
-    console.log("elapsed");
     display.setText(getFormatedDisplay(elapsed));
     if (elapsed == 0) {
       resetStartStop(btStartStop);
@@ -3905,7 +3996,6 @@ function main() {
   let controles = { descricao: "", comando: () => {
   } };
   cronometerStore.subscribe((state) => state.intervaloId, (intervaloId) => {
-    console.log("intervaloId");
     controles = intervaloId ? {
       descricao: "Pausar",
       comando: pause
@@ -3913,6 +4003,7 @@ function main() {
       descricao: "Continuar",
       comando: resume
     };
+    startOrPause = controles.descricao == "Pausar" ? "pause" : "start";
     if (btStartStop.text() != controles.descricao) {
       btStartStop.setText(controles.descricao);
       btStartStop.removeEventListener("clicked", start);
@@ -3921,56 +4012,21 @@ function main() {
       btStartStop.addEventListener("clicked", controles.comando);
     }
   });
-  const win = new import_nodegui.QMainWindow();
-  win.setWindowTitle("Cronometro");
-  win.setWindowIcon(new import_nodegui.QIcon(path.join(__dirname, "../assets/logo-clock.png")));
-  const centralWidget = new import_nodegui.QWidget();
-  const rootLayout = new import_nodegui.QBoxLayout(import_nodegui.Direction.TopToBottom);
-  centralWidget.setObjectName("wgtRoot");
-  centralWidget.setLayout(rootLayout);
-  const tbThemes = new import_nodegui.QToolButton();
-  tbThemes.setPopupMode(import_nodegui.ToolButtonPopupMode.MenuButtonPopup);
-  tbThemes.setToolButtonStyle(import_nodegui.ToolButtonStyle.ToolButtonFollowStyle);
-  const menu = new import_nodegui.QMenu(tbThemes);
-  tbThemes.setMenu(menu);
-  themes.forEach((t) => {
-    const menuAction = new import_nodegui.QAction();
-    menuAction.setText(t.theme);
-    menuAction.addEventListener("triggered", () => {
-      cronometerStore.getState().setTheme({ ...t });
-      tbThemes.setText(t.theme);
-      win.setStyleSheet(setStyles(t.fontColor, t.backgroundColor, t.displayFontColor));
-    });
-    menu.addAction(menuAction);
-  });
+  let win = new import_nodegui.QMainWindow();
+  let centralWidget = new import_nodegui.QWidget();
+  let rootLayout = new import_nodegui.QBoxLayout(import_nodegui.Direction.TopToBottom);
+  let tbThemes = new import_nodegui.QToolButton();
+  let menu = new import_nodegui.QMenu(tbThemes);
   let theme2 = cronometerStore.getState().selectedTheme;
-  tbThemes.setText(theme2.theme);
-  tbThemes.setObjectName("tbThemes");
-  const display = new import_nodegui.QLabel();
-  display.setObjectName("display");
-  display.setText(getFormatedDisplay(cronometerStore.getState().elapsed));
-  const btStartStop = new import_nodegui.QPushButton();
-  btStartStop.setObjectName("btStartStop");
-  resetStartStop(btStartStop);
-  const btReset = new import_nodegui.QPushButton();
-  btReset.setObjectName("btReset");
-  btReset.setText("Reiniciar");
-  btReset.addEventListener("clicked", reset);
-  rootLayout.addWidget(display);
-  rootLayout.addWidget(btStartStop);
-  rootLayout.addWidget(btReset);
-  rootLayout.addWidget(tbThemes);
-  win.setCentralWidget(centralWidget);
-  win.setMinimumWidth(300);
-  const screen = import_nodegui.QApplication.primaryScreen().geometry();
-  const x = screen.width() - 300;
-  const y = screen.height() - 300;
+  let display = new import_nodegui.QLabel();
+  let btStartStop = new import_nodegui.QPushButton();
+  let btReset = new import_nodegui.QPushButton();
+  let screen = import_nodegui.QApplication.primaryScreen().geometry();
+  let x = screen.width() - 300;
+  let y = screen.height() - 300;
   win.move(x / 2, y / 2);
-  function setStyles(fontColor, backgroundColor, displayFontColor) {
+  function setStyles(fontColor, backgroundColor, displayFontColor, displaySize = "66px") {
     return `
-      #tbThemes {
-        color:${fontColor};
-      }
       #btStartStop {
         color:${fontColor};
       }
@@ -3985,14 +4041,18 @@ function main() {
       }
       #display {
         color: ${displayFontColor};
-        font-size: 66px;
+        font-size: ${displaySize};
         font-weight: bold;
         padding: 1;
+      }
+      #tbThemes {
+        color:${fontColor};
+        flex:1;
       }
     `;
   }
   win.setStyleSheet(setStyles(theme2.fontColor, theme2.backgroundColor, theme2.displayFontColor));
-  win.show();
+  maximize();
   global.win = win;
 }
 main();

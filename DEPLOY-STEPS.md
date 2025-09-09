@@ -1,6 +1,10 @@
+DELETAR a pasta deploy
+
 npx nodegui-packer --init chrono
 
 npm run build
+
+echo "module.exports = require('./main.cjs');" > ./dist/index.js
 
 npx nodegui-packer --pack ./dist
 

@@ -2,7 +2,7 @@
 /dist/
 node_modules/
 tmp-jam-pack-nodegui/
-
+/deploy
 
 .history
 

@@ -1,7 +1,7 @@
 [
-  {"theme":"Monokai", "backgroundColor":"rgb(5, 7, 24)",     "fontColor":"rgb(19, 19, 24)",   "displayFontColor":"rgb(50,50,200)"},
-  {"theme":"Dracula", "backgroundColor":"rgb(80, 4, 33)",    "fontColor":"rgb(214, 174, 204)","displayFontColor":"rgb(177, 1, 59)"},
-  {"theme":"Midnight","backgroundColor":"rgb(0, 0, 0)",      "fontColor":"rgb(11, 11, 80)",   "displayFontColor":"rgb(1, 1, 196)"},
-  {"theme":"Light",   "backgroundColor":"rgb(255,255,255)",  "fontColor":"rgb(13, 13, 37)",   "displayFontColor":"rgb(151, 151, 161)"},
-  {"theme":"Windows", "backgroundColor":"rgb(107, 107, 107)","fontColor":"rgb(0, 0, 0)",      "displayFontColor":"rgb(23, 23, 26)"}
+  {"theme":"Monokai", "backgroundColor":"rgb(5, 7, 24)",     "bgTranspColor":"rgba(5, 7, 24, 0.2)",     "fontColor":"rgb(19, 19, 24)",   "displayFontColor":"rgb(50,50,200)"},
+  {"theme":"Dracula", "backgroundColor":"rgb(80, 4, 33)",    "bgTranspColor":"rgba(80, 4, 33, 0.2)",    "fontColor":"rgb(214, 174, 204)","displayFontColor":"rgb(177, 1, 59)"},
+  {"theme":"Midnight","backgroundColor":"rgb(0, 0, 0)",      "bgTranspColor":"rgba(0, 0, 0, 0.2)",      "fontColor":"rgb(11, 11, 80)",   "displayFontColor":"rgb(1, 1, 196)"},
+  {"theme":"Light",   "backgroundColor":"rgb(255,255,255)",  "bgTranspColor":"rgba(255,255,255, 0.2)",  "fontColor":"rgb(13, 13, 37)",   "displayFontColor":"rgb(151, 151, 161)"},
+  {"theme":"Windows", "backgroundColor":"rgb(107, 107, 107)","bgTranspColor":"rgba(107, 107, 107, 0.2)","fontColor":"rgb(0, 0, 0)",      "displayFontColor":"rgb(23, 23, 26)"}
 ]
