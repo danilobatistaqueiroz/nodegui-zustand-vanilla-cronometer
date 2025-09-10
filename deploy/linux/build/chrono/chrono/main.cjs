@@ -3890,6 +3890,7 @@ function main() {
   const maximize = () => {
     win.close();
     win = new import_nodegui.QMainWindow();
+    win.setWindowOpacity(0.6);
     win.setWindowTitle("Cronometro");
     win.setWindowIcon(new import_nodegui.QIcon(path.join(__dirname, "../assets/logo-clock.png")));
     centralWidget = new import_nodegui.QWidget();
@@ -3937,16 +3938,21 @@ function main() {
     rootLayout.addWidget(tbThemes);
     win.setCentralWidget(centralWidget);
     win.setMinimumWidth(300);
-    screen = import_nodegui.QApplication.primaryScreen().geometry();
-    x = screen.width() - 300;
-    y = screen.height() - 300;
-    win.move(x / 2, y / 2);
+    win.move(screenX / 2, screenY / 2);
+    win.addEventListener(import_nodegui.WidgetEventTypes.Move, (e) => {
+      screenX = win.x();
+      screenY = win.y();
+      win.setWindowOpacity(0.6);
+    });
     win.setStyleSheet(setStyles(theme2.fontColor, theme2.backgroundColor, theme2.displayFontColor));
+    win.setWindowOpacity(0.6);
     win.show();
+    win.setWindowOpacity(0.6);
   };
   const minimize = () => {
     win.close();
     win = new import_nodegui.QMainWindow();
+    win.setWindowOpacity(0.6);
     win.setWindowIcon(new import_nodegui.QIcon(path.join(__dirname, "../assets/logo-clock.png")));
     win.setWindowFlag(import_nodegui.WindowType.WindowStaysOnTopHint | import_nodegui.WindowType.FramelessWindowHint, true);
     const centralWidget2 = new import_nodegui.QWidget();
@@ -3967,13 +3973,11 @@ function main() {
     win.setCentralWidget(centralWidget2);
     win.setMinimumWidth(40);
     win.setMinimumHeight(10);
-    win.setWindowOpacity(0.4);
-    screen = import_nodegui.QApplication.primaryScreen().geometry();
-    x = screen.width() - 300;
-    y = 300;
-    win.move(x, y);
+    win.move(screenX, screenY);
     win.setStyleSheet(setStyles(theme2.fontColor, theme2.bgTranspColor, theme2.displayFontColor, "33px"));
+    win.setWindowOpacity(0.6);
     win.show();
+    win.setWindowOpacity(0.6);
   };
   function getFormatedDisplay(pelapsed = 0, value = "01/01/2025 00:00:00") {
     let time = new Date(value);
@@ -4022,9 +4026,9 @@ function main() {
   let btStartStop = new import_nodegui.QPushButton();
   let btReset = new import_nodegui.QPushButton();
   let screen = import_nodegui.QApplication.primaryScreen().geometry();
-  let x = screen.width() - 300;
-  let y = screen.height() - 300;
-  win.move(x / 2, y / 2);
+  let screenX = screen.width() - 300;
+  let screenY = screen.height() - 300;
+  win.move(screenX / 2, screenY / 2);
   function setStyles(fontColor, backgroundColor, displayFontColor, displaySize = "66px") {
     return `
       #btStartStop {
@@ -4052,6 +4056,7 @@ function main() {
     `;
   }
   win.setStyleSheet(setStyles(theme2.fontColor, theme2.backgroundColor, theme2.displayFontColor));
+  win.setWindowOpacity(0.5);
   maximize();
   global.win = win;
 }

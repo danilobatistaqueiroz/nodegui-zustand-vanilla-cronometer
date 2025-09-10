@@ -37,6 +37,7 @@ function main(): void {
     win.close();
 
     win = new QMainWindow();
+    win.setWindowOpacity(0.6);
     win.setWindowTitle("Cronometro");
     win.setWindowIcon(new QIcon(path.join(__dirname, '../assets/logo-clock.png')));
   
@@ -100,17 +101,21 @@ function main(): void {
     win.addEventListener(WidgetEventTypes.Move, (e:any) => {
       screenX = win.x();
       screenY = win.y();
+      win.setWindowOpacity(0.6);
     })
 
 
     win.setStyleSheet(
       setStyles(theme.fontColor,theme.backgroundColor,theme.displayFontColor)
     );
+    win.setWindowOpacity(0.6);
     win.show();
+    win.setWindowOpacity(0.6);
   }
   const minimize = () => {
     win.close();
     win = new QMainWindow();
+    win.setWindowOpacity(0.6);
     win.setWindowIcon(new QIcon(path.join(__dirname, '../assets/logo-clock.png')));
     win.setWindowFlag(WindowType.WindowStaysOnTopHint | WindowType.FramelessWindowHint,true);
 
@@ -135,14 +140,15 @@ function main(): void {
     win.setCentralWidget(centralWidget);
     win.setMinimumWidth(40);
     win.setMinimumHeight(10);
-    win.setWindowOpacity(0.4);
-
     win.move(screenX,screenY);
 
     win.setStyleSheet(
       setStyles(theme.fontColor,theme.bgTranspColor,theme.displayFontColor,'33px')
     );
+
+    win.setWindowOpacity(0.6);
     win.show();
+    win.setWindowOpacity(0.6);
   }
 
   function getFormatedDisplay(pelapsed:number=0,value:string="01/01/2025 00:00:00"){
@@ -231,6 +237,7 @@ function main(): void {
   win.setStyleSheet(
     setStyles(theme.fontColor,theme.backgroundColor,theme.displayFontColor)
   );
+  win.setWindowOpacity(0.5);
   maximize();
 
   (global as any).win = win;
