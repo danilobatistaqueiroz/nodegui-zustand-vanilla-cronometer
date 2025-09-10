@@ -1,5 +1,5 @@
 import { cronometerStore } from "./store";
-import { QApplication, QMainWindow, QWidget, QLabel, QPushButton, QIcon, QBoxLayout, ToolButtonPopupMode, QToolButton, Direction, ToolButtonStyle, QMenu, QAction, WidgetEventTypes, QMouseEvent, MouseButton, WindowType } from '@nodegui/nodegui';
+import { QApplication, QMainWindow, QWidget, QLabel, QPushButton, QIcon, QBoxLayout, ToolButtonPopupMode, QToolButton, Direction, ToolButtonStyle, QMenu, QAction, WidgetEventTypes, QMouseEvent, MouseButton, WindowType, QMoveEvent } from '@nodegui/nodegui';
 import * as path from "node:path";
 import sourceMapSupport from 'source-map-support';
 
@@ -95,10 +95,13 @@ function main(): void {
     win.setCentralWidget(centralWidget);
     win.setMinimumWidth(300);
   
-    screen = QApplication.primaryScreen().geometry();
-    x = screen.width()-300;
-    y = screen.height()-300;
-    win.move(x/2,y/2);
+    win.move(screenX/2,screenY/2);
+
+    win.addEventListener(WidgetEventTypes.Move, (e:any) => {
+      screenX = win.x();
+      screenY = win.y();
+    })
+
 
     win.setStyleSheet(
       setStyles(theme.fontColor,theme.backgroundColor,theme.displayFontColor)
@@ -134,10 +137,7 @@ function main(): void {
     win.setMinimumHeight(10);
     win.setWindowOpacity(0.4);
 
-    screen = QApplication.primaryScreen().geometry();
-    x = screen.width()-300;
-    y = 300;
-    win.move(x,y);
+    win.move(screenX,screenY);
 
     win.setStyleSheet(
       setStyles(theme.fontColor,theme.bgTranspColor,theme.displayFontColor,'33px')
@@ -197,9 +197,9 @@ function main(): void {
   let btReset = new QPushButton();
 
   let screen = QApplication.primaryScreen().geometry();
-  let x = screen.width()-300;
-  let y = screen.height()-300;
-  win.move(x/2,y/2);
+  let screenX = screen.width()-300;
+  let screenY = screen.height()-300;
+  win.move(screenX/2,screenY/2);
   
   function setStyles(fontColor:string,backgroundColor:string,displayFontColor:string,displaySize:string='66px'): string{
     return `
